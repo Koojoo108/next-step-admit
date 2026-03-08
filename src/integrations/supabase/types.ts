@@ -14,16 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      announcements: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      applications: {
+        Row: {
+          address: string | null
+          bece_index: string | null
+          bece_year: string | null
+          created_at: string
+          date_of_birth: string | null
+          english_grade: string | null
+          first_choice: string | null
+          full_name: string | null
+          gender: string | null
+          guardian_name: string | null
+          guardian_phone: string | null
+          id: string
+          jhs_location: string | null
+          jhs_name: string | null
+          math_grade: string | null
+          nationality: string | null
+          science_grade: string | null
+          second_choice: string | null
+          social_grade: string | null
+          status: string
+          third_choice: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          bece_index?: string | null
+          bece_year?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          english_grade?: string | null
+          first_choice?: string | null
+          full_name?: string | null
+          gender?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          id?: string
+          jhs_location?: string | null
+          jhs_name?: string | null
+          math_grade?: string | null
+          nationality?: string | null
+          science_grade?: string | null
+          second_choice?: string | null
+          social_grade?: string | null
+          status?: string
+          third_choice?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          bece_index?: string | null
+          bece_year?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          english_grade?: string | null
+          first_choice?: string | null
+          full_name?: string | null
+          gender?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          id?: string
+          jhs_location?: string | null
+          jhs_name?: string | null
+          math_grade?: string | null
+          nationality?: string | null
+          science_grade?: string | null
+          second_choice?: string | null
+          social_grade?: string | null
+          status?: string
+          third_choice?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          file_name: string
+          file_path: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          file_name: string
+          file_path: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      programmes: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +320,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "student"],
+    },
   },
 } as const
