@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText, Upload, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 const statusConfig: Record<string, { icon: any; color: string; label: string }> = {
   draft: { icon: FileText, color: 'text-muted-foreground', label: 'Draft' },
