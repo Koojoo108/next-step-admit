@@ -31,8 +31,8 @@ const AdmissionsPage = () => {
       {/* Hero */}
       <section className="gradient-hero py-20">
         <div className="container mx-auto px-4">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-4">Admission Information</h1>
-          <p className="text-primary-foreground/80 max-w-xl text-lg">
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">Admission Information</h1>
+          <p className="text-white/80 max-w-xl text-lg">
             Everything you need to know about applying to Prestige Senior High School.
           </p>
         </div>
@@ -134,8 +134,8 @@ const AdmissionsPage = () => {
       {/* CTA */}
       <section className="py-16 gradient-hero text-center">
         <div className="container mx-auto px-4">
-          <h2 className="font-display text-3xl font-bold text-primary-foreground mb-4">Start Your Application</h2>
-          <p className="text-primary-foreground/80 mb-8 max-w-lg mx-auto">Don't miss the deadline. Apply today for the 2026/2027 academic year.</p>
+          <h2 className="font-display text-3xl font-bold text-white mb-4">Start Your Application</h2>
+          <p className="text-white/80 mb-8 max-w-lg mx-auto">Don't miss the deadline. Apply today for the 2026/2027 academic year.</p>
           <Link to="/register">
             <Button variant="hero" size="lg">Apply Now <ArrowRight className="ml-2 h-5 w-5" /></Button>
           </Link>

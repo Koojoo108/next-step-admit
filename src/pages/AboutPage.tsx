@@ -19,8 +19,8 @@ const AboutPage = () => {
           <div className="absolute inset-0 gradient-hero opacity-75" />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground">About Our School</h1>
-          <p className="text-primary-foreground/80 mt-4 max-w-xl text-lg">Over 60 years of academic excellence and character development.</p>
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-white">About Our School</h1>
+          <p className="text-white/80 mt-4 max-w-xl text-lg">Over 60 years of academic excellence and character development.</p>
         </div>
       </section>
 

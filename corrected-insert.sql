@@ -1,0 +1,59 @@
+-- CORRECTED: Force insert the localStorage application into database
+-- Using only columns that actually exist in the applications table
+
+INSERT INTO public.applications (
+  user_id,
+  full_name,
+  email,
+  phone,
+  date_of_birth,
+  gender,
+  address,
+  guardian_name,
+  guardian_phone,
+  parent_relationship,
+  programme,
+  programme_name,
+  preferred_campus,
+  passport_photo_url,
+  medical_conditions,
+  jhs_name,
+  bece_index,
+  year_of_completion,
+  declaration_accepted,
+  digital_signature,
+  status,
+  application_date,
+  application_id_display,
+  created_at,
+  updated_at
+) VALUES (
+  '0f6a5384-912d-4158-b3d0-26d058aa9251',
+  'JOSEPH NYARKO',
+  'nyarkojosephnsonamoah018@gmail.com',
+  '+233501234567',
+  '2000-01-01',
+  'Male',
+  'Accra, Ghana',
+  'Parent Name',
+  '+233501234568',
+  'Parent',
+  'General Science',
+  'Science Department',
+  'Main Campus',
+  null,
+  'None',
+  'JHS School',
+  'BECE123456',
+  '2023',
+  true,
+  'Digital Signature',
+  'pending',
+  '2026-03-16T23:00:00Z',
+  '5d171767-fbf0-4ded-81a6-90d7219e5d92',
+  now(),
+  now()
+) ON CONFLICT (application_id_display) DO NOTHING;
+
+-- Verify insertion
+SELECT * FROM public.applications WHERE application_id_display = '5d171767-fbf0-4ded-81a6-90d7219e5d92';

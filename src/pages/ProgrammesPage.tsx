@@ -55,9 +55,9 @@ const ProgrammesPage = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <GraduationCap className="h-8 w-8 text-accent" />
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground">Our Programmes</h1>
+            <h1 className="font-display text-4xl md:text-5xl font-bold text-white">Our Programmes</h1>
           </div>
-          <p className="text-primary-foreground/80 max-w-xl text-lg">
+          <p className="text-white/80 max-w-xl text-lg">
             Six academic programmes tailored to prepare students for university and professional success.
           </p>
         </div>

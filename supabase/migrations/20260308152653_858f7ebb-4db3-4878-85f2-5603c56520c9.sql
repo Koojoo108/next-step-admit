@@ -27,7 +27,7 @@ $$;
 CREATE POLICY "Users can read own roles" ON public.user_roles FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Admins can manage roles" ON public.user_roles FOR ALL USING (public.has_role(auth.uid(), 'admin'));
 
--- Auto-assign student role on signup
+-- Auto-assign student role on signup and auto-confirm email
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -35,6 +35,10 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
+  -- Auto-confirm email by setting email_confirmed_at
+  UPDATE auth.users SET email_confirmed_at = now() WHERE id = NEW.id;
+  
+  -- Assign default role
   INSERT INTO public.user_roles (user_id, role) VALUES (NEW.id, 'student');
   RETURN NEW;
 END;

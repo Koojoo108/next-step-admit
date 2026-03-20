@@ -32,7 +32,8 @@ const ApplicantsPage = () => {
   };
 
   const filtered = applications.filter(a => {
-    const matchesSearch = a.full_name?.toLowerCase().includes(search.toLowerCase()) || a.bece_index?.includes(search);
+    const fullName = `${a.first_name || ''} ${a.middle_name || ''} ${a.last_name || ''}`.trim().toLowerCase();
+    const matchesSearch = fullName.includes(search.toLowerCase()) || a.bece_index?.includes(search);
     const matchesStatus = statusFilter === 'all' || a.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -73,28 +74,30 @@ const ApplicantsPage = () => {
             <tbody>
               {filtered.map(app => (
                 <tr key={app.id} className="border-t border-border">
-                  <td className="px-4 py-3 text-foreground">{app.full_name || 'N/A'}</td>
+                  <td className="px-4 py-3 text-foreground font-medium">
+                    {app.first_name} {app.last_name}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{app.bece_index || 'N/A'}</td>
                   <td className="px-4 py-3 text-muted-foreground">{app.first_choice || 'N/A'}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-                      app.status === 'approved' ? 'bg-success/10 text-success' :
-                      app.status === 'rejected' ? 'bg-destructive/10 text-destructive' :
-                      app.status === 'pending' ? 'bg-warning/10 text-warning' :
-                      'bg-muted text-muted-foreground'
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                      app.status === 'approved' ? 'bg-success/10 text-success border border-success/20' :
+                      app.status === 'rejected' ? 'bg-destructive/10 text-destructive border border-destructive/20' :
+                      app.status === 'pending' ? 'bg-warning/10 text-warning border border-warning/20' :
+                      'bg-muted text-muted-foreground border border-border'
                     }`}>
                       {app.status}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <Button variant="ghost" size="sm" onClick={() => setSelected(app)}>
+                    <Button variant="ghost" size="sm" onClick={() => setSelected(app)} className="h-8 w-8 p-0 rounded-full hover:bg-muted">
                       <Eye className="h-4 w-4" />
                     </Button>
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No applications found</td></tr>
+                <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-foreground italic">No applications found matching your criteria</td></tr>
               )}
             </tbody>
           </table>
@@ -103,36 +106,91 @@ const ApplicantsPage = () => {
 
       {/* Detail Dialog */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-display">Applicant Details</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-[2rem] p-0 border-none shadow-2xl">
           {selected && (
-            <div className="space-y-4 text-sm">
-              <div className="grid grid-cols-2 gap-4">
-                <div><span className="text-muted-foreground">Name:</span> <span className="font-medium">{selected.full_name}</span></div>
-                <div><span className="text-muted-foreground">Gender:</span> <span className="font-medium">{selected.gender}</span></div>
-                <div><span className="text-muted-foreground">DOB:</span> <span className="font-medium">{selected.date_of_birth}</span></div>
-                <div><span className="text-muted-foreground">Nationality:</span> <span className="font-medium">{selected.nationality}</span></div>
-                <div><span className="text-muted-foreground">Address:</span> <span className="font-medium">{selected.address}</span></div>
-                <div><span className="text-muted-foreground">Guardian:</span> <span className="font-medium">{selected.guardian_name}</span></div>
-                <div><span className="text-muted-foreground">JHS:</span> <span className="font-medium">{selected.jhs_name}</span></div>
-                <div><span className="text-muted-foreground">BECE:</span> <span className="font-medium">{selected.bece_index} ({selected.bece_year})</span></div>
-                <div><span className="text-muted-foreground">1st Choice:</span> <span className="font-medium">{selected.first_choice}</span></div>
-                <div><span className="text-muted-foreground">2nd Choice:</span> <span className="font-medium">{selected.second_choice}</span></div>
-                <div><span className="text-muted-foreground">3rd Choice:</span> <span className="font-medium">{selected.third_choice}</span></div>
-                <div><span className="text-muted-foreground">Grades:</span> <span className="font-medium">E:{selected.english_grade} M:{selected.math_grade} S:{selected.science_grade} SS:{selected.social_grade}</span></div>
-              </div>
-              <div className="flex gap-2 pt-4 border-t border-border">
-                <Button onClick={() => updateStatus(selected.id, 'approved')} className="bg-success text-success-foreground hover:bg-success/90">
-                  <CheckCircle className="h-4 w-4 mr-1" /> Approve
-                </Button>
-                <Button variant="destructive" onClick={() => updateStatus(selected.id, 'rejected')}>
-                  <XCircle className="h-4 w-4 mr-1" /> Reject
-                </Button>
-                <Button variant="outline" onClick={() => updateStatus(selected.id, 'waitlisted')}>
-                  <Clock className="h-4 w-4 mr-1" /> Waitlist
-                </Button>
+            <div className="flex flex-col">
+              <div className="h-2 bg-gradient-to-r from-primary to-accent" />
+              <div className="p-8 md:p-12 space-y-10">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-3xl font-black uppercase tracking-tight italic text-primary">
+                      {selected.first_name} <span className="text-foreground">{selected.last_name}</span>
+                    </h2>
+                    <p className="text-muted-foreground font-medium text-sm mt-1">Application ID: <span className="text-foreground font-bold">{selected.application_id_display || 'PENDING'}</span></p>
+                  </div>
+                  <div className={`px-4 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-[0.2em] ${
+                    selected.status === 'approved' ? 'bg-success/10 text-success border-success/20' :
+                    selected.status === 'pending' ? 'bg-warning/10 text-warning border-warning/20' :
+                    'bg-muted text-muted-foreground border-border'
+                  }`}>
+                    {selected.status}
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-10">
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-b pb-2">Personal & Contact</h3>
+                      <div className="space-y-2">
+                        <DetailRow label="Gender" value={selected.gender} />
+                        <DetailRow label="DOB" value={selected.date_of_birth} />
+                        <DetailRow label="Nationality" value={selected.nationality} />
+                        <DetailRow label="Email" value={selected.email_address} />
+                        <DetailRow label="Phone" value={selected.phone_number} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-b pb-2">Programme Selection</h3>
+                      <div className="space-y-2">
+                        <DetailRow label="1st Choice" value={selected.first_choice} />
+                        <DetailRow label="2nd Choice" value={selected.second_choice} />
+                        <DetailRow label="Mode" value={selected.mode_of_study} />
+                        <DetailRow label="Campus" value={selected.preferred_campus} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-b pb-2">Academic Record</h3>
+                      <div className="space-y-2">
+                        <DetailRow label="JHS Name" value={selected.jhs_name} />
+                        <DetailRow label="Index No" value={selected.bece_index} />
+                        <DetailRow label="Exam Year" value={selected.bece_year} />
+                        <DetailRow label="Exam Body" value={selected.exam_body} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-b pb-2">Guardian Info</h3>
+                      <div className="space-y-2">
+                        <DetailRow label="Name" value={selected.guardian_name} />
+                        <DetailRow label="Relation" value={selected.parent_relationship} />
+                        <DetailRow label="Contact" value={selected.guardian_phone} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {selected.personal_statement && (
+                  <div className="bg-muted/30 p-8 rounded-3xl space-y-3 border border-border/50">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Personal Statement</h3>
+                    <p className="text-sm leading-relaxed text-foreground/80 italic">"{selected.personal_statement}"</p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-3 pt-6 border-t border-border">
+                  <Button onClick={() => updateStatus(selected.id, 'approved')} className="bg-success hover:bg-success/90 text-white rounded-xl h-11 px-6 font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-success/10">
+                    <CheckCircle className="h-4 w-4 mr-2" /> Approve Application
+                  </Button>
+                  <Button variant="destructive" onClick={() => updateStatus(selected.id, 'rejected')} className="rounded-xl h-11 px-6 font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-destructive/10">
+                    <XCircle className="h-4 w-4 mr-2" /> Reject
+                  </Button>
+                  <Button variant="outline" onClick={() => updateStatus(selected.id, 'waitlisted')} className="rounded-xl h-11 px-6 font-bold text-xs uppercase tracking-widest transition-all border-2">
+                    <Clock className="h-4 w-4 mr-2" /> Waitlist
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -141,5 +199,12 @@ const ApplicantsPage = () => {
     </div>
   );
 };
+
+const DetailRow = ({ label, value }: { label: string; value: any }) => (
+  <div className="flex justify-between text-xs py-1 border-b border-border/30 last:border-0">
+    <span className="text-muted-foreground font-bold uppercase tracking-tighter">{label}:</span>
+    <span className="text-foreground font-black text-right">{value || 'N/A'}</span>
+  </div>
+);
 
 export default ApplicantsPage;
