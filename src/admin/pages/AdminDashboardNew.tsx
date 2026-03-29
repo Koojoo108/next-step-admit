@@ -18,10 +18,10 @@ import {
   Phone,
   Archive,
   Download,
-  Filter
+  Filter,
+  RefreshCw
 } from 'lucide-react';
 import { adminDataService } from '../services/adminDataService';
-import { apiService } from '../services/apiService';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 
 interface DashboardStats {
@@ -60,44 +60,24 @@ const AdminDashboard = () => {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      // Fetch stats from Supabase via adminDataService
+      const dashboardStats = await adminDataService.getDashboardStats();
+      setStats(dashboardStats);
+
+      // Fetch recent activity from Supabase
+      const activity = await adminDataService.getRecentActivity();
+      setRecentActivity(activity as RecentActivity[]);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Fetch real dashboard data from Express API
-    const fetchDashboardData = async () => {
-      setLoading(true);
-      
-      try {
-        const data = await apiService.getDashboardStats();
-        
-        setStats({
-          totalApplications: data.totalApplications || 0,
-          pendingApplications: data.pendingReview || 0,
-          approvedApplications: data.approvedApplications || 0,
-          rejectedApplications: 0, // Add logic if needed
-          totalStudents: data.totalStudents || 0,
-          recentApplications: data.recentActivity?.length || 0,
-          applicationGrowth: 0,
-          admissionRate: data.totalApplications > 0 ? Math.round((data.approvedApplications / data.totalApplications) * 100) : 0
-        });
-
-        if (data.recentActivity) {
-          const mappedActivity = data.recentActivity.map((act: any, idx: number) => ({
-            id: `act-${idx}`,
-            type: 'application',
-            title: `Application: ${act.first_name} ${act.last_name}`,
-            description: `Status: ${act.status}`,
-            timestamp: act.updated_at,
-            status: act.status === 'Admitted' ? 'success' : 'info'
-          }));
-          setRecentActivity(mappedActivity);
-        }
-
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
   }, []);
 
@@ -113,10 +93,10 @@ const AdminDashboard = () => {
 
   const getActivityColor = (status: string) => {
     switch (status) {
-      case 'success': return 'bg-success/10 text-success border-success/20';
-      case 'warning': return 'bg-warning/10 text-warning border-warning/20';
+      case 'success': return 'bg-green-50 text-green-700 border-green-200';
+      case 'warning': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
       case 'error': return 'bg-destructive/10 text-destructive border-destructive/20';
-      case 'info': return 'bg-info/10 text-info border-info/20';
+      case 'info': return 'bg-blue-50 text-blue-700 border-blue-200';
       default: return 'bg-muted text-muted-foreground border-border';
     }
   };
@@ -129,7 +109,6 @@ const AdminDashboard = () => {
     
     if (hours < 1) return 'Just now';
     if (hours < 24) return `${hours}h ago`;
-    if (hours < 48) return `${Math.floor(hours / 24)}d ago`;
     return `${Math.floor(hours / 24)}d ago`;
   };
 
@@ -143,23 +122,14 @@ const AdminDashboard = () => {
         <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-lg flex flex-col gap-2">
           <div className="flex items-center gap-2 font-bold">
             <AlertTriangle className="h-5 w-5" />
-            Database Permission Required
+            Admin Role Required
           </div>
           <p className="text-sm">
-            You are logged in as <span className="font-mono font-bold underline">{user.email}</span>, but this user does not have the "admin" role assigned in the <code className="bg-destructive/20 px-1 rounded">user_roles</code> table. 
-            <strong> All delete or update actions will be blocked by Supabase security policies.</strong>
+            You are logged in as <span className="font-mono font-bold underline">{user.email}</span>, but this user does not have the "admin" role assigned.
           </p>
-          <div className="mt-2">
-            <p className="text-xs font-semibold uppercase tracking-wider mb-1">How to fix:</p>
-            <pre className="bg-background/50 p-3 rounded border border-destructive/20 text-[10px] overflow-x-auto font-mono">
-              {`INSERT INTO public.user_roles (user_id, role) 
-VALUES ('${user.id}', 'admin') 
-ON CONFLICT (user_id, role) DO NOTHING;`}
-            </pre>
-            <p className="text-[10px] mt-1 opacity-70 italic">Copy and run the SQL above in your Supabase Dashboard SQL Editor.</p>
-          </div>
         </div>
       )}
+
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -167,13 +137,13 @@ ON CONFLICT (user_id, role) DO NOTHING;`}
           <p className="text-muted-foreground">Overview of admission system and key metrics</p>
         </div>
         <div className="flex gap-2">
-         <Button onClick={() => exportReport('csv')} variant="outline" size="sm">
+          <Button onClick={fetchDashboardData} variant="outline" size="sm" disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button onClick={() => exportReport('csv')} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Export CSV
-          </Button>
-          <Button onClick={() => exportReport('excel')} variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export Excel
           </Button>
         </div>
       </div>
@@ -187,26 +157,17 @@ ON CONFLICT (user_id, role) DO NOTHING;`}
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalApplications.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground flex items-center">
-              {stats.applicationGrowth > 0 ? (
-                <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-              ) : (
-                <TrendingDown className="h-3 w-3 mr-1 text-red-500" />
-              )}
-              <span className={stats.applicationGrowth > 0 ? 'text-green-500' : 'text-red-500'}>
-                {Math.abs(stats.applicationGrowth)}% from last month
-              </span>
-            </p>
+            <p className="text-xs text-muted-foreground">All submitted applications</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.pendingApplications}</div>
+            <div className="text-2xl font-bold">{stats.pendingApplications}</div>
             <p className="text-xs text-muted-foreground">Awaiting review</p>
           </CardContent>
         </Card>
@@ -214,40 +175,40 @@ ON CONFLICT (user_id, role) DO NOTHING;`}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Approved</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.approvedApplications}</div>
+            <div className="text-2xl font-bold">{stats.approvedApplications}</div>
             <p className="text-xs text-muted-foreground">Successfully admitted</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            <Users className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-sm font-medium">Registered Students</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalStudents.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Active students</p>
+            <p className="text-xs text-muted-foreground">Total registered accounts</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Charts and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Admission Rate Chart */}
+        {/* Admission Rate */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Admission Rate</CardTitle>
+            <CardTitle>Admission Overview</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center h-32">
               <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600">{stats.admissionRate}%</div>
-                <p className="text-sm text-gray-600">Acceptance Rate</p>
-                <div className="text-xs text-gray-500 mt-2">
-                  Based on {stats.approvedApplications + stats.rejectedApplications} applications
+                <div className="text-4xl font-bold text-primary">{stats.admissionRate}%</div>
+                <p className="text-sm text-muted-foreground">Acceptance Rate</p>
+                <div className="text-xs text-muted-foreground mt-2">
+                  {stats.approvedApplications} approved of {stats.totalApplications} total
                 </div>
               </div>
             </div>
@@ -258,15 +219,19 @@ ON CONFLICT (user_id, role) DO NOTHING;`}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Recent Activity</CardTitle>
-            <Button variant="ghost" size="sm">
-              <Eye className="h-4 w-4" />
+            <Button variant="ghost" size="sm" onClick={fetchDashboardData}>
+              <RefreshCw className="h-4 w-4" />
             </Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : recentActivity.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  No recent activity yet. Applications will appear here.
                 </div>
               ) : (
                 recentActivity.map((activity) => (
@@ -278,11 +243,11 @@ ON CONFLICT (user_id, role) DO NOTHING;`}
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">{activity.title}</p>
-                      <p className="text-xs text-muted-foreground">{activity.description}</p>
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-xs opacity-80">{activity.description}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Calendar className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">{formatTime(activity.timestamp)}</span>
+                        <Calendar className="h-3 w-3 opacity-70" />
+                        <span className="text-xs opacity-70">{formatTime(activity.timestamp)}</span>
                       </div>
                     </div>
                   </div>
