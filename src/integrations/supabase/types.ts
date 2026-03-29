@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
@@ -35,194 +37,79 @@ export type Database = {
       }
       applications: {
         Row: {
-          id: string
-          user_id: string
-          full_name: string | null
-          first_name: string | null
-          middle_name: string | null
-          last_name: string | null
-          gender: string | null
-          date_of_birth: string | null
-          place_of_birth: string | null
-          nationality: string | null
-          religion: string | null
-          marital_status: string | null
-          email: string | null
-          phone: string | null
-          alt_phone: string | null
           address: string | null
-          city_town: string | null
-          region_state: string | null
-          country: string | null
-          digital_address: string | null
-          level_of_study: string | null
-          faculty_school: string | null
-          programme: string | null
-          programme_name: string | null
-          second_choice_programme: string | null
-          elective_combination: string | null
-          mode_of_study: string | null
-          preferred_campus: string | null
-          academic_year: string | null
-          jhs_name: string | null
-          jhs_location: string | null
-          exam_body: string | null
           bece_index: string | null
           bece_year: string | null
-          year_of_completion: string | null
-          subjects_grades: Json | null
-          math_grade: string | null
+          created_at: string
+          date_of_birth: string | null
           english_grade: string | null
-          science_grade: string | null
-          social_grade: string | null
+          first_choice: string | null
+          full_name: string | null
+          gender: string | null
           guardian_name: string | null
           guardian_phone: string | null
-          parent_relationship: string | null
-          parent_email: string | null
-          parent_occupation: string | null
-          parent_address: string | null
-          id_type: string | null
-          id_number: string | null
-          passport_photo_url: string | null
-          national_id_url: string | null
-          disability_status: string | null
-          medical_conditions: string | null
-          extracurriculars: string | null
-          personal_statement: string | null
-          personal_info: Json | null
-          declaration_accepted: boolean
-          digital_signature: string | null
+          id: string
+          jhs_location: string | null
+          jhs_name: string | null
+          math_grade: string | null
+          nationality: string | null
+          science_grade: string | null
+          second_choice: string | null
+          social_grade: string | null
           status: string
-          application_date: string | null
-          application_id_display: string | null
-          created_at: string
+          third_choice: string | null
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          full_name?: string | null
-          first_name?: string | null
-          middle_name?: string | null
-          last_name?: string | null
-          gender?: string | null
-          date_of_birth?: string | null
-          place_of_birth?: string | null
-          nationality?: string | null
-          religion?: string | null
-          marital_status?: string | null
-          email?: string | null
-          phone?: string | null
-          alt_phone?: string | null
           address?: string | null
-          city_town?: string | null
-          region_state?: string | null
-          country?: string | null
-          digital_address?: string | null
-          level_of_study?: string | null
-          faculty_school?: string | null
-          programme?: string | null
-          programme_name?: string | null
-          elective_combination?: string | null
-          mode_of_study?: string | null
-          preferred_campus?: string | null
-          academic_year?: string | null
-          jhs_name?: string | null
-          jhs_location?: string | null
-          exam_body?: string | null
           bece_index?: string | null
           bece_year?: string | null
-          year_of_completion?: string | null
-          subjects_grades?: Json | null
-          math_grade?: string | null
+          created_at?: string
+          date_of_birth?: string | null
           english_grade?: string | null
-          science_grade?: string | null
-          social_grade?: string | null
+          first_choice?: string | null
+          full_name?: string | null
+          gender?: string | null
           guardian_name?: string | null
           guardian_phone?: string | null
-          parent_relationship?: string | null
-          parent_email?: string | null
-          parent_occupation?: string | null
-          parent_address?: string | null
-          id_type?: string | null
-          id_number?: string | null
-          passport_photo_url?: string | null
-          national_id_url?: string | null
-          disability_status?: string | null
-          medical_conditions?: string | null
-          extracurriculars?: string | null
-          personal_statement?: string | null
-          personal_info?: Json | null
-          declaration_accepted?: boolean
-          digital_signature?: string | null
+          id?: string
+          jhs_location?: string | null
+          jhs_name?: string | null
+          math_grade?: string | null
+          nationality?: string | null
+          science_grade?: string | null
+          second_choice?: string | null
+          social_grade?: string | null
           status?: string
-          application_date?: string | null
-          application_id_display?: string | null
-          created_at?: string
+          third_choice?: string | null
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          full_name?: string | null
-          first_name?: string | null
-          middle_name?: string | null
-          last_name?: string | null
-          gender?: string | null
-          date_of_birth?: string | null
-          place_of_birth?: string | null
-          nationality?: string | null
-          religion?: string | null
-          marital_status?: string | null
-          email?: string | null
-          phone?: string | null
-          alt_phone?: string | null
           address?: string | null
-          city_town?: string | null
-          region_state?: string | null
-          country?: string | null
-          digital_address?: string | null
-          level_of_study?: string | null
-          faculty_school?: string | null
-          programme?: string | null
-          programme_name?: string | null
-          elective_combination?: string | null
-          mode_of_study?: string | null
-          preferred_campus?: string | null
-          academic_year?: string | null
-          jhs_name?: string | null
-          jhs_location?: string | null
-          exam_body?: string | null
           bece_index?: string | null
           bece_year?: string | null
-          year_of_completion?: string | null
-          subjects_grades?: Json | null
-          math_grade?: string | null
+          created_at?: string
+          date_of_birth?: string | null
           english_grade?: string | null
-          science_grade?: string | null
-          social_grade?: string | null
+          first_choice?: string | null
+          full_name?: string | null
+          gender?: string | null
           guardian_name?: string | null
           guardian_phone?: string | null
-          parent_relationship?: string | null
-          parent_email?: string | null
-          parent_occupation?: string | null
-          parent_address?: string | null
-          id_type?: string | null
-          id_number?: string | null
-          passport_photo_url?: string | null
-          national_id_url?: string | null
-          disability_status?: string | null
-          medical_conditions?: string | null
-          extracurriculars?: string | null
-          personal_statement?: string | null
-          personal_info?: Json | null
-          declaration_accepted?: boolean
-          digital_signature?: string | null
+          id?: string
+          jhs_location?: string | null
+          jhs_name?: string | null
+          math_grade?: string | null
+          nationality?: string | null
+          science_grade?: string | null
+          second_choice?: string | null
+          social_grade?: string | null
           status?: string
-          application_date?: string | null
-          application_id_display?: string | null
-          created_at?: string
+          third_choice?: string | null
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -289,72 +176,6 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
-        }
-        Relationships: []
-      }
-      payments: {
-        Row: {
-          id: string
-          application_id: string | null
-          user_id: string
-          amount: number
-          currency: string
-          status: string
-          reference: string | null
-          payment_method: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          application_id?: string | null
-          user_id: string
-          amount: number
-          currency?: string
-          status?: string
-          reference?: string | null
-          payment_method?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          application_id?: string | null
-          user_id?: string
-          amount?: number
-          currency?: string
-          status?: string
-          reference?: string | null
-          payment_method?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          id: string
-          email: string | null
-          full_name: string | null
-          avatar_url: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          email?: string | null
-          full_name?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          email?: string | null
-          full_name?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          updated_at?: string
         }
         Relationships: []
       }
