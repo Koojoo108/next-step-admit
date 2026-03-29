@@ -133,7 +133,7 @@ const AdminDashboard = () => {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
-  const exportReport = (type: string) => {
+  const exportReport = (type: 'csv' | 'excel') => {
     adminDataService.exportApplications(type);
   };
 
@@ -167,13 +167,13 @@ ON CONFLICT (user_id, role) DO NOTHING;`}
           <p className="text-muted-foreground">Overview of admission system and key metrics</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => exportReport('applications')} variant="outline" size="sm">
+         <Button onClick={() => exportReport('csv')} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Export Report
+            Export CSV
           </Button>
-          <Button onClick={() => exportReport('students')} variant="outline" size="sm">
+          <Button onClick={() => exportReport('excel')} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Export Students
+            Export Excel
           </Button>
         </div>
       </div>

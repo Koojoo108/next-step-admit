@@ -10,12 +10,11 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Application {
   id: string;
-  status: 'pending' | 'approved' | 'rejected';
-  application_date: string;
-  full_name: string;
-  email: string;
-  programme: string;
-  application_id_display: string;
+  status: string;
+  created_at: string;
+  full_name: string | null;
+  first_choice: string | null;
+  [key: string]: any;
 }
 
 const StudentDashboard = () => {
@@ -36,7 +35,7 @@ const StudentDashboard = () => {
         .from('applications')
         .select('*')
         .eq('user_id', user?.id)
-        .order('application_date', { ascending: false });
+        .order('created_at', { ascending: false });
 
       console.log('[StudentDashboard] Database response - data:', data);
       console.log('[StudentDashboard] Database response - error:', error);

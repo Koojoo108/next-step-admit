@@ -13,47 +13,37 @@ export interface DashboardStats {
 
 export interface Application {
   id: string;
-  application_id_display?: string;
   user_id: string;
-  full_name: string;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  phone?: string;
-  status: 'draft' | 'pending' | 'reviewed' | 'admitted' | 'rejected';
+  full_name: string | null;
+  status: string;
   created_at: string;
   updated_at: string;
-  programme?: string;
-  programme_name?: string;
-  elective_combination?: string;
-  city_town?: string;
-  region_state?: string;
-  personal_info?: any;
+  first_choice: string | null;
+  second_choice: string | null;
+  third_choice: string | null;
+  gender: string | null;
+  date_of_birth: string | null;
+  nationality: string | null;
+  address: string | null;
+  guardian_name: string | null;
+  guardian_phone: string | null;
+  jhs_name: string | null;
+  jhs_location: string | null;
+  bece_index: string | null;
+  bece_year: string | null;
+  english_grade: string | null;
+  math_grade: string | null;
+  science_grade: string | null;
+  social_grade: string | null;
 }
 
 export interface Student {
   id: string;
-  full_name: string;
-  email?: string;
-  phone?: string;
+  full_name: string | null;
   student_id: string;
   program: string;
-  elective_combination?: string;
   admission_date: string;
   status: string;
-}
-
-export interface Payment {
-  id: string;
-  user_id: string;
-  amount: number;
-  status: string;
-  reference: string;
-  created_at: string;
-  user?: {
-    full_name: string;
-    email: string;
-  };
 }
 
 class AdminDataService {
@@ -79,8 +69,9 @@ class AdminDataService {
         .eq('status', 'rejected');
 
       const { count: totalUsers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
+        .from('user_roles')
+        .select('*', { count: 'exact', head: true })
+        .eq('role', 'student');
 
       const total = totalApplications || 0;
       const approved = approvedApplications || 0;
@@ -91,7 +82,7 @@ class AdminDataService {
         pendingApplications: pendingApplications || 0,
         approvedApplications: approved,
         rejectedApplications: rejectedApplications || 0,
-        totalStudents: totalUsers || 0, // This will now show total registered users
+        totalStudents: totalUsers || 0,
         recentApplications: 0,
         applicationGrowth: 0,
         admissionRate
@@ -118,22 +109,15 @@ class AdminDataService {
       }
 
       if (filters?.search) {
-        query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`);
+        query = query.ilike('full_name', `%${filters.search}%`);
       }
       
       const { data, count, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const mappedApplications = (data || []).map(app => ({
-        ...app,
-        fullName: app.full_name,
-        programmeName: app.programme_name || app.programme,
-        electiveCombination: app.elective_combination,
-      })) as any[];
-
       return { 
-        applications: mappedApplications, 
+        applications: (data || []) as Application[], 
         total: count || 0 
       };
     } catch (error) {
@@ -152,7 +136,7 @@ class AdminDataService {
         .eq('status', 'admitted');
 
       if (filters?.search) {
-        query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`);
+        query = query.ilike('full_name', `%${filters.search}%`);
       }
 
       const { data, count, error } = await query.order('created_at', { ascending: false });
@@ -160,12 +144,13 @@ class AdminDataService {
       if (error) throw error;
 
       const mappedStudents = (data || []).map(student => ({
-        ...student,
-        fullName: student.full_name,
-        admissionDate: student.created_at,
-        program: student.programme_name || student.programme || 'N/A',
-        studentId: student.application_id_display || student.id,
-      })) as any[];
+        id: student.id,
+        full_name: student.full_name,
+        student_id: student.id,
+        program: student.first_choice || 'N/A',
+        admission_date: student.created_at,
+        status: student.status,
+      }));
 
       return { students: mappedStudents, total: count || 0 };
     } catch (error) {
@@ -219,88 +204,39 @@ class AdminDataService {
 
   async getRecentActivity(): Promise<any[]> {
     try {
-      // Get recent applications
       const { data: apps, error: appsError } = await supabase
         .from('applications')
         .select('id, full_name, status, updated_at')
         .order('updated_at', { ascending: false })
-        .limit(5);
+        .limit(8);
 
       if (appsError) throw appsError;
 
-      // Get recent registrations
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, created_at')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (profilesError) throw profilesError;
-
-      const appActivity = (apps || []).map(app => ({
+      return (apps || []).map(app => ({
         id: `app-${app.id}`,
         type: 'application',
-        title: `Application Update: ${app.full_name}`,
-        description: `Status changed to ${app.status}`,
+        title: `Application: ${app.full_name || 'Unknown'}`,
+        description: `Status: ${app.status}`,
         timestamp: app.updated_at,
         status: app.status === 'admitted' ? 'success' : 'info'
       }));
-
-      const profileActivity = (profiles || []).map(profile => ({
-        id: `profile-${profile.id}`,
-        type: 'admission', // Using admission type as a placeholder for registration
-        title: `New User: ${profile.full_name}`,
-        description: `Successfully registered an account`,
-        timestamp: profile.created_at,
-        status: 'success'
-      }));
-
-      // Combine and sort by timestamp
-      return [...appActivity, ...profileActivity]
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        .slice(0, 8);
     } catch (error) {
       console.error('Error fetching activity:', error);
       return [];
     }
   }
 
-  async getPayments(): Promise<Payment[]> {
-    try {
-      const { data, error } = await supabase
-        .from('payments')
-        .select(`
-          *,
-          user:profiles(full_name, email)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-         const { data: rawData, error: rawError } = await supabase
-            .from('payments')
-            .select('*');
-         if (rawError) throw rawError;
-         return rawData as any;
-      }
-
-      return data as any;
-    } catch (error) {
-      console.error('Error fetching payments:', error);
-      return [];
-    }
-  }
-
   async getDocuments(): Promise<any[]> {
     try {
-        const { data, error } = await supabase
-            .from('documents')
-            .select('*')
-            .order('created_at', { ascending: false });
-        if (error) throw error;
-        return data;
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
     } catch (error) {
-        console.error('Error fetching documents:', error);
-        return [];
+      console.error('Error fetching documents:', error);
+      return [];
     }
   }
 
@@ -308,15 +244,9 @@ class AdminDataService {
     search?: string;
   }): Promise<{ users: any[]; total: number }> {
     try {
-      let query = supabase
-        .from('profiles')
+      const { data, count, error } = await supabase
+        .from('user_roles')
         .select('*', { count: 'exact' });
-
-      if (filters?.search) {
-        query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`);
-      }
-
-      const { data, count, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
 
