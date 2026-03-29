@@ -23,7 +23,7 @@ describe('useApplicationState', () => {
       email: 'john@example.com',
       phone: '1234567890',
       dateOfBirth: new Date('2000-01-01'),
-      gender: 'male',
+      gender: 'male' as const,
       address: '123 Main St',
     };
     useApplicationState.getState().updatePersonal(personalInfo);
