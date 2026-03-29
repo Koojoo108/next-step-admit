@@ -1,69 +1,69 @@
 export interface PassportInfo {
-  passportPhotoUrl: string;
+  passportPhotoUrl?: string;
 }
 
 export interface HealthInfo {
-  bloodType: string;
-  medicalConditions: string;
-  allergies: string;
-  emergencyContact: {
-    name: string;
-    phone: string;
-    relationship: string;
+  bloodType?: string;
+  medicalConditions?: string;
+  allergies?: string;
+  emergencyContact?: {
+    name?: string;
+    phone?: string;
+    relationship?: string;
   };
 }
 
 export interface JhsInfo {
-  jhsName: string;
-  beceIndexNumber: string;
-  graduationYear: number;
+  jhsName?: string;
+  beceIndexNumber?: string;
+  graduationYear?: number;
   aggregateScore?: string;
 }
 
 export interface DocumentsInfo {
-  birthCertificateUrl: string;
-  beceResultsUrl: string;
-  transcriptUrl: string;
-  otherDocumentsUrl: string;
+  birthCertificateUrl?: string;
+  beceResultsUrl?: string;
+  transcriptUrl?: string;
+  otherDocumentsUrl?: string;
 }
 
 export interface DeclarationInfo {
-  declaration: boolean;
-  declarationDate: Date;
-  applicantSignature: string;
+  declaration?: boolean;
+  declarationDate?: Date;
+  applicantSignature?: string;
 }
 
 export interface PersonalInfo {
-  fullName: string;
-  dateOfBirth: Date;
-  gender: 'male' | 'female' | 'other' | 'prefer-not-to-say';
-  email: string;
-  phone: string;
-  address: string;
+  fullName?: string;
+  dateOfBirth?: Date;
+  gender?: 'male' | 'female' | 'other' | 'prefer-not-to-say';
+  email?: string;
+  phone?: string;
+  address?: string;
 }
 
 export interface GuardianInfo {
-  name: string;
-  relationship: string;
-  contact: string;
+  name?: string;
+  relationship?: string;
+  contact?: string;
   emergencyAlternate?: {
-    name: string;
-    contact: string;
+    name?: string;
+    contact?: string;
   };
 }
 
 export interface AcademicInfo {
-  previousInstitutions: {
-    name: string;
-    graduationDate: number;
+  previousInstitutions?: {
+    name?: string;
+    graduationDate?: number;
   }[];
 }
 
 export interface ProgramInfo {
-  major: string;
-  department: string;
-  enrollmentTerm: string;
-  housingPreference: 'on-campus' | 'off-campus' | 'undecided';
+  major?: string;
+  department?: string;
+  enrollmentTerm?: string;
+  housingPreference?: 'on-campus' | 'off-campus' | 'undecided';
 }
 
 export interface ApplicationState {

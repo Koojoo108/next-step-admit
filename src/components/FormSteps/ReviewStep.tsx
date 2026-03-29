@@ -75,7 +75,7 @@ const ReviewStep = React.forwardRef<StepHandle>((_props, ref) => {
         </CardHeader>
         <CardContent>
           {academic?.previousInstitutions.map((inst, i) => (
-            <p key={i}><strong>{inst.name}:</strong> Graduated {inst.graduationDate}, GPA: {inst.gpa}</p>
+            <p key={i}><strong>{inst.name}:</strong> Graduated {inst.graduationDate}</p>
           ))}
         </CardContent>
       </Card>
@@ -86,8 +86,8 @@ const ReviewStep = React.forwardRef<StepHandle>((_props, ref) => {
           <CardTitle>Program Selection</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p><strong>Major:</strong> {program?.major}</p>
-          <p><strong>Campus:</strong> {program?.campusLocation}</p>
+           <p><strong>Major:</strong> {program?.major}</p>
+           <p><strong>Housing:</strong> {program?.housingPreference}</p>
         </CardContent>
       </Card>
 

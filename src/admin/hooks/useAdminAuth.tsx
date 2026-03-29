@@ -174,7 +174,6 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const logout = async () => {
     try {
-      await apiService.logout();
       await supabase.auth.signOut();
     } catch (err) {
       console.error('[AdminAuth] Error during API logout:', err);
