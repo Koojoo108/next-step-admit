@@ -261,7 +261,7 @@ const AdminLayout = () => {
         
         {/* Footer */}
         <footer className="bg-card border-t border-border py-4 px-6 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Prestige SHS. All rights reserved.
+          &copy; {new Date().getFullYear()} Duapa Academy. All rights reserved.
         </footer>
       </div>
 

@@ -119,7 +119,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const isAdminEmail = email === 'admin@duapa.edu.gh';
       const isAdminPassword = password === 'Off0241800448$';
       
-      if (!isAdminEmail) {
+      if (!isAdminEmail || !isAdminPassword) {
         setLoading(false);
         return { success: false, error: 'Invalid admin credentials' };
       }

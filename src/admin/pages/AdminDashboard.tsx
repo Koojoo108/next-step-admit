@@ -231,7 +231,7 @@ const AdminDashboard = () => {
           <div className="flex items-center gap-3">
             <img src={schoolCrest} alt="Crest" className="h-8 w-8" />
             <div>
-              <h1 className="font-bold text-gray-900">Prestige SHS</h1>
+              <h1 className="font-bold text-gray-900">Duapa Academy</h1>
               <p className="text-xs text-gray-500">Admin Portal</p>
             </div>
           </div>

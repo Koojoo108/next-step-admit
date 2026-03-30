@@ -47,7 +47,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm">© {new Date().getFullYear()} Prestige Senior High School. All rights reserved.</p>
+          <p className="text-sm">© {new Date().getFullYear()} Duapa Academy. All rights reserved.</p>
           
           <Button 
             variant="ghost" 

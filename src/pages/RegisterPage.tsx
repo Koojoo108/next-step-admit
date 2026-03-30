@@ -267,7 +267,7 @@ const RegisterPage = () => {
 
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
           <img src={schoolCrest} alt="Crest" className="h-8 w-8" />
-          <span className="font-display font-bold text-foreground text-sm tracking-tight">Prestige SHS</span>
+          <span className="font-display font-bold text-foreground text-sm tracking-tight">Duapa Academy</span>
         </div>
 
         <div className="w-full max-w-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 py-12 lg:py-0">

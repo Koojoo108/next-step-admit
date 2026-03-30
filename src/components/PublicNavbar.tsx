@@ -21,7 +21,7 @@ const PublicNavbar = () => {
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center gap-3">
           <img src={schoolCrest} alt="Crest" className="h-10 w-10" />
-          <span className="font-display text-lg font-bold text-primary">Prestige SHS</span>
+          <span className="font-display text-lg font-bold text-primary">Duapa Academy</span>
         </Link>
 
         {/* Desktop */}

@@ -149,7 +149,7 @@ const HomePage = () => {
             <Link to="/register" className="block">
               <Button variant="hero" size="lg" className="w-full sm:w-auto">Start Application</Button>
             </Link>
-            <a href="mailto:admissions@prestigeshs.edu.gh" className="block">
+            <a href="mailto:admissions@duapa.edu.gh" className="block">
               <Button variant="hero-outline" size="lg" className="w-full sm:w-auto">Contact Us</Button>
             </a>
           </div>
