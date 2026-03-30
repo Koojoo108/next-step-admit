@@ -137,7 +137,7 @@ const RegisterPage = () => {
     <div className="hidden lg:flex flex-col justify-between w-1/2 bg-slate-950 p-12 relative overflow-hidden">
       <div className="relative z-10 flex items-center gap-3">
         <img src={schoolCrest} alt="Crest" className="h-10 w-10 brightness-0 invert" />
-        <span className="font-display font-bold text-white text-xl tracking-tight">Prestige Portal</span>
+        <span className="font-display font-bold text-white text-xl tracking-tight">Duapa Academy</span>
       </div>
 
       <div className="relative z-10 max-w-lg space-y-6">
