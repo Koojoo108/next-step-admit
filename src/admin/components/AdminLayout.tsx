@@ -117,9 +117,9 @@ const AdminLayout = () => {
         {/* Sidebar Header */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <img src={schoolCrest} alt="Prestige SHS" className="h-8 w-8 object-contain" />
+            <img src={schoolCrest} alt="Duapa Academy" className="h-8 w-8 object-contain" />
             <div>
-              <h1 className="text-lg font-bold text-foreground">Prestige SHS</h1>
+              <h1 className="text-lg font-bold text-foreground">Duapa Academy</h1>
               <p className="text-xs text-muted-foreground">Admin Portal</p>
             </div>
           </div>
@@ -261,7 +261,7 @@ const AdminLayout = () => {
         
         {/* Footer */}
         <footer className="bg-card border-t border-border py-4 px-6 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Prestige SHS. All rights reserved.
+          &copy; {new Date().getFullYear()} Duapa Academy. All rights reserved.
         </footer>
       </div>
 

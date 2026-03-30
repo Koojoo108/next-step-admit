@@ -81,7 +81,7 @@ const StudentDashboard = () => {
   };
 
   const handleEmailSupport = () => {
-    window.location.href = "mailto:admissions@prestigeshs.edu.gh?subject=Student Support Request - " + (user?.email || "");
+    window.location.href = "mailto:admissions@duapa.edu.gh?subject=Student Support Request - " + (user?.email || "");
   };
 
   const getStatusColor = (status: string) => {

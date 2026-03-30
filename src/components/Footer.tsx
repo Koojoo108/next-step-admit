@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <img src={schoolCrest} alt="School Crest" className="h-12 w-12" />
-              <span className="font-display text-lg font-bold text-primary">Prestige SHS</span>
+              <span className="font-display text-lg font-bold text-primary">Duapa Academy</span>
             </div>
             <p className="text-sm leading-relaxed">
               Nurturing excellence in education since 1965. Building tomorrow's leaders today.
@@ -41,13 +41,13 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li>P.O. Box 1234, Accra, Ghana</li>
               <li>+233 30 123 4567</li>
-              <li>admissions@prestigeshs.edu.gh</li>
+              <li>admissions@duapa.edu.gh</li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm">© {new Date().getFullYear()} Prestige Senior High School. All rights reserved.</p>
+          <p className="text-sm">© {new Date().getFullYear()} Duapa Academy. All rights reserved.</p>
           
           <Button 
             variant="ghost" 

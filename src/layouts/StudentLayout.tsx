@@ -72,7 +72,7 @@ const StudentLayout = () => {
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-primary transform transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block shadow-2xl`}>
         <div className="flex items-center gap-3 p-5 border-b border-white/10">
           <img src={schoolCrest} alt="Crest" className="h-8 w-8" />
-          <span className="font-display font-bold text-accent text-sm tracking-tight italic">Prestige Portal</span>
+          <span className="font-display font-bold text-accent text-sm tracking-tight italic">Duapa Academy</span>
           <button className="md:hidden ml-auto text-accent p-1" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
         </div>
         <nav className="p-4 space-y-1">

@@ -30,7 +30,7 @@ const AdminLayout = () => {
           <img src={schoolCrest} alt="Crest" className="h-8 w-8" />
           <div>
             <span className="font-display font-bold text-accent text-sm block">Admin Panel</span>
-            <span className="text-xs text-sidebar-foreground/50 flex items-center gap-1"><Shield size={10} /> Prestige SHS</span>
+            <span className="text-xs text-sidebar-foreground/50 flex items-center gap-1"><Shield size={10} /> Duapa Academy</span>
           </div>
           <button className="md:hidden ml-auto text-accent" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
         </div>

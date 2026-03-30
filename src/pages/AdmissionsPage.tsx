@@ -33,7 +33,7 @@ const AdmissionsPage = () => {
         <div className="container mx-auto px-4">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">Admission Information</h1>
           <p className="text-white/80 max-w-xl text-lg">
-            Everything you need to know about applying to Prestige Senior High School.
+            Everything you need to know about applying to Duapa Academy.
           </p>
         </div>
       </section>

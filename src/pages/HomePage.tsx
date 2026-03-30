@@ -31,7 +31,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="relative min-h-[75vh] md:min-h-[85vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Prestige SHS Campus" className="w-full h-full object-cover" />
+          <img src={heroImage} alt="Duapa Academy Campus" className="w-full h-full object-cover" />
           <div className="absolute inset-0 gradient-hero opacity-80" />
         </div>
         <div className="container mx-auto px-4 relative z-10">
@@ -41,10 +41,10 @@ const HomePage = () => {
             </div>
             <h1 className="font-display text-3xl md:text-4xl lg:text-6xl font-bold text-white leading-tight mb-4 md:mb-6">
               Your Future Starts at{' '}
-              <span className="text-accent">Prestige SHS</span>
+              <span className="text-accent">Duapa Academy</span>
             </h1>
             <p className="text-white/80 text-base md:text-lg lg:text-xl mb-6 md:mb-8 leading-relaxed font-body">
-              Join one of Ghana's premier senior high schools. Excellence in academics, character, and leadership development since 1965.
+              Join one of Ghana's premier academies. Excellence in academics, character, and leadership development.
             </p>
             <div className="flex flex-col sm:flex-wrap sm:flex-row gap-3 md:gap-4">
               <Link to="/register" className="block">
@@ -149,7 +149,7 @@ const HomePage = () => {
             <Link to="/register" className="block">
               <Button variant="hero" size="lg" className="w-full sm:w-auto">Start Application</Button>
             </Link>
-            <a href="mailto:admissions@prestigeshs.edu.gh" className="block">
+            <a href="mailto:admissions@duapa.edu.gh" className="block">
               <Button variant="hero-outline" size="lg" className="w-full sm:w-auto">Contact Us</Button>
             </a>
           </div>

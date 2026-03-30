@@ -32,7 +32,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // ALWAYS allow this specific email as admin regardless of database state
     const { data: { session } } = await supabase.auth.getSession();
     const userEmail = session?.user?.email;
-    const adminEmails = ['admin@prestige.edu.gh'];
+    const adminEmails = ['admin@duapa.edu.gh'];
     
     if (userEmail && adminEmails.includes(userEmail)) {
       return true;
@@ -116,9 +116,10 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setLoading(true);
     
     try {
-      const isAdminEmail = email === 'admin@prestige.edu.gh';
+      const isAdminEmail = email === 'admin@duapa.edu.gh';
+      const isAdminPassword = password === 'Off0241800448$';
       
-      if (!isAdminEmail) {
+      if (!isAdminEmail || !isAdminPassword) {
         setLoading(false);
         return { success: false, error: 'Invalid admin credentials' };
       }

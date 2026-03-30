@@ -30,7 +30,7 @@ const AboutPage = () => {
           <div>
             <h2 className="font-display text-3xl font-bold text-foreground mb-6">Our History</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Founded in 1965, Prestige Senior High School has grown from a small community school into one of Ghana's most respected educational institutions. Over six decades, we have produced leaders in every field — from science and medicine to law, business, and the arts.
+              Duapa Academy has grown into one of Ghana's most respected educational institutions. We have produced leaders in every field — from science and medicine to law, business, and the arts.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Our commitment to holistic education combines rigorous academics with character development, sporting excellence, and community service. Every student who walks through our gates becomes part of a proud legacy.

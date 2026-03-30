@@ -137,7 +137,7 @@ const RegisterPage = () => {
     <div className="hidden lg:flex flex-col justify-between w-1/2 bg-slate-950 p-12 relative overflow-hidden">
       <div className="relative z-10 flex items-center gap-3">
         <img src={schoolCrest} alt="Crest" className="h-10 w-10 brightness-0 invert" />
-        <span className="font-display font-bold text-white text-xl tracking-tight">Prestige Portal</span>
+        <span className="font-display font-bold text-white text-xl tracking-tight">Duapa Academy</span>
       </div>
 
       <div className="relative z-10 max-w-lg space-y-6">
@@ -145,7 +145,7 @@ const RegisterPage = () => {
           Join our community of scholars.
         </h2>
         <p className="text-primary-foreground/70 text-lg">
-          Create an account to begin your journey towards academic excellence at Prestige Senior High School.
+          Create an account to begin your journey towards academic excellence at Duapa Academy.
         </p>
         <div className="space-y-4 pt-4">
           {['Email Verification', 'SMS OTP Authentication', 'Secure Portal Access'].map((label) => (
@@ -157,7 +157,7 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      <div className="relative z-10 text-primary-foreground/50 text-sm">© 2026 Prestige Senior High School.</div>
+      <div className="relative z-10 text-primary-foreground/50 text-sm">© 2026 Duapa Academy.</div>
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[100px]" />
       <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px]" />
     </div>
@@ -267,7 +267,7 @@ const RegisterPage = () => {
 
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
           <img src={schoolCrest} alt="Crest" className="h-8 w-8" />
-          <span className="font-display font-bold text-foreground text-sm tracking-tight">Prestige SHS</span>
+          <span className="font-display font-bold text-foreground text-sm tracking-tight">Duapa Academy</span>
         </div>
 
         <div className="w-full max-w-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 py-12 lg:py-0">
