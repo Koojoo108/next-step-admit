@@ -44,7 +44,7 @@ const HomePage = () => {
               <span className="text-accent">Duapa Academy</span>
             </h1>
             <p className="text-white/80 text-base md:text-lg lg:text-xl mb-6 md:mb-8 leading-relaxed font-body">
-              Join one of Ghana's premier senior high schools. Excellence in academics, character, and leadership development since 1965.
+              Join one of Ghana's premier academies. Excellence in academics, character, and leadership development.
             </p>
             <div className="flex flex-col sm:flex-wrap sm:flex-row gap-3 md:gap-4">
               <Link to="/register" className="block">
