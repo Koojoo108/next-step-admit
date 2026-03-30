@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <img src={schoolCrest} alt="School Crest" className="h-12 w-12" />
-              <span className="font-display text-lg font-bold text-primary">Prestige SHS</span>
+              <span className="font-display text-lg font-bold text-primary">Duapa Academy</span>
             </div>
             <p className="text-sm leading-relaxed">
               Nurturing excellence in education since 1965. Building tomorrow's leaders today.
