@@ -41,7 +41,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li>P.O. Box 1234, Accra, Ghana</li>
               <li>+233 30 123 4567</li>
-              <li>admissions@prestigeshs.edu.gh</li>
+              <li>admissions@duapa.edu.gh</li>
             </ul>
           </div>
         </div>
