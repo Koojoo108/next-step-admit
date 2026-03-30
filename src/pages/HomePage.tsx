@@ -31,7 +31,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="relative min-h-[75vh] md:min-h-[85vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Prestige SHS Campus" className="w-full h-full object-cover" />
+          <img src={heroImage} alt="Duapa Academy Campus" className="w-full h-full object-cover" />
           <div className="absolute inset-0 gradient-hero opacity-80" />
         </div>
         <div className="container mx-auto px-4 relative z-10">
