@@ -145,7 +145,7 @@ const RegisterPage = () => {
           Join our community of scholars.
         </h2>
         <p className="text-primary-foreground/70 text-lg">
-          Create an account to begin your journey towards academic excellence at Prestige Senior High School.
+          Create an account to begin your journey towards academic excellence at Duapa Academy.
         </p>
         <div className="space-y-4 pt-4">
           {['Email Verification', 'SMS OTP Authentication', 'Secure Portal Access'].map((label) => (
