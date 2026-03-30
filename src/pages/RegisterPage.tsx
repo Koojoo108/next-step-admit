@@ -157,7 +157,7 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      <div className="relative z-10 text-primary-foreground/50 text-sm">© 2026 Prestige Senior High School.</div>
+      <div className="relative z-10 text-primary-foreground/50 text-sm">© 2026 Duapa Academy.</div>
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[100px]" />
       <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px]" />
     </div>
