@@ -47,7 +47,7 @@ class SMSVerificationService {
       });
 
       // Send SMS with verification code
-      const message = `Your Prestige SHS verification code is: ${verificationCode}. This code expires in 5 minutes.`;
+      const message = `Your Duapa Academy verification code is: ${verificationCode}. This code expires in 5 minutes.`;
       const smsResult = await smsService.sendSMS({
         phoneNumber: formattedPhone,
         message,

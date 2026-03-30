@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
         body: new URLSearchParams({
           To: phone,
           From: '+15005550006', // Twilio test number; replace with your real Twilio number
-          Body: `Your Prestige SHS verification code is: ${otp}. This code expires in 5 minutes. Do not share it with anyone.`,
+          Body: `Your Duapa Academy verification code is: ${otp}. This code expires in 5 minutes. Do not share it with anyone.`,
         }),
       });
 

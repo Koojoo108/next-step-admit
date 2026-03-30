@@ -47,7 +47,7 @@ const queryClient = new QueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="prestige-theme">
+      <ThemeProvider defaultTheme="light" storageKey="duapa-theme">
         <BrowserRouter>
           <AuthProvider>
             <AdminAuthProvider>
