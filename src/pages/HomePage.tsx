@@ -41,7 +41,7 @@ const HomePage = () => {
             </div>
             <h1 className="font-display text-3xl md:text-4xl lg:text-6xl font-bold text-white leading-tight mb-4 md:mb-6">
               Your Future Starts at{' '}
-              <span className="text-accent">Prestige SHS</span>
+              <span className="text-accent">Duapa Academy</span>
             </h1>
             <p className="text-white/80 text-base md:text-lg lg:text-xl mb-6 md:mb-8 leading-relaxed font-body">
               Join one of Ghana's premier senior high schools. Excellence in academics, character, and leadership development since 1965.
