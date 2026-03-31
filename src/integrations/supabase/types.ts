@@ -140,6 +140,53 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          application_id: string | null
+          created_at: string
+          currency: string
+          id: string
+          payment_date: string
+          payment_method: string | null
+          reference: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          application_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_date?: string
+          payment_method?: string | null
+          reference?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          application_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_date?: string
+          payment_method?: string | null
+          reference?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       programmes: {
         Row: {
           created_at: string
