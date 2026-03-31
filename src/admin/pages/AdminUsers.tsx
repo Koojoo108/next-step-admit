@@ -1,103 +1,79 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, Shield } from 'lucide-react';
-import { apiService } from '../services/apiService';
+import { Shield, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const AdminUsers = () => {
-  const [admins, setAdmins] = useState<any[]>([]);
+  const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAdmins = async () => {
-      setLoading(true);
-      try {
-        const data = await apiService.getUsers();
-        setAdmins(data);
-      } catch (err: any) {
-        toast.error('Failed to load admin users');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAdmins();
-  }, []);
-
-  const handleAddAdmin = () => {
-    // Basic prompt for demonstration, a dialog would be better
-    const email = prompt('Enter admin email:');
-    if (!email) return;
-    const fullName = prompt('Enter full name:');
-    if (!fullName) return;
-    const password = prompt('Enter password:');
-    if (!password) return;
-
-    apiService.createAdminUser({ email, fullName, password, role: 'Admin' })
-      .then(() => {
-        toast.success('Admin added successfully');
-        apiService.getUsers().then(setAdmins);
-      })
-      .catch(err => toast.error(err.message));
+  const fetchRoles = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('*')
+        .order('role');
+      if (error) throw error;
+      setRoles(data || []);
+    } catch (err) {
+      toast.error('Failed to load user roles');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => { fetchRoles(); }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Admin Users</h1>
-        <Button onClick={handleAddAdmin}>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Admin
+        <h1 className="text-2xl font-bold text-foreground">User Roles</h1>
+        <Button variant="outline" size="sm" onClick={fetchRoles} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </Button>
       </div>
-      
-      <Card>
+
+      <Card className="border-border bg-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">User ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Role</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {admins.map((admin) => (
-                  <tr key={admin.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
-                          <Shield className="h-4 w-4 text-gray-600" />
+              <tbody className="divide-y divide-border">
+                {loading ? (
+                  <tr><td colSpan={2} className="px-6 py-12 text-center"><RefreshCw className="h-6 w-6 animate-spin mx-auto text-muted-foreground" /></td></tr>
+                ) : roles.length === 0 ? (
+                  <tr>
+                    <td colSpan={2} className="px-6 py-12 text-center text-muted-foreground">
+                      <Shield className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                      <p>No user roles found.</p>
+                    </td>
+                  </tr>
+                ) : roles.map(r => (
+                  <tr key={r.id} className="hover:bg-muted/30">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                          <Shield className="h-4 w-4 text-primary" />
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{admin.full_name}</div>
-                          <div className="text-sm text-gray-500">{admin.email}</div>
-                        </div>
+                        <span className="font-mono text-xs text-foreground">{r.user_id.slice(0, 12)}...</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {admin.role}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge className="bg-green-100 text-green-800">
-                        Active
+                    <td className="px-6 py-4">
+                      <Badge className={r.role === 'admin' ? 'bg-primary/10 text-primary' : 'bg-success/10 text-success'}>
+                        {r.role}
                       </Badge>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-900 cursor-pointer">
-                      Edit
                     </td>
                   </tr>
                 ))}
-                {!loading && admins.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
-                      No admin users found.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
@@ -108,4 +84,3 @@ const AdminUsers = () => {
 };
 
 export default AdminUsers;
-
