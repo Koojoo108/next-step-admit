@@ -1,80 +1,83 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { adminDataService } from '../services/adminDataService';
-import { apiService } from '../services/apiService';
+import { RefreshCw, CreditCard } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const Payments = () => {
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPayments = async () => {
-      setLoading(true);
-      try {
-        const data = await apiService.getPayments();
-        setPayments(data);
-      } catch (err: any) {
-        toast.error('Failed to load payments');
-      } finally {
-        setLoading(false);
-      }
+  const fetchPayments = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .select('*')
+        .order('payment_date', { ascending: false });
+      if (error) throw error;
+      setPayments(data || []);
+    } catch (err) {
+      toast.error('Failed to load payments');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchPayments(); }, []);
+
+  const getStatusColor = (status: string) => {
+    const map: Record<string, string> = {
+      paid: 'bg-success/10 text-success',
+      pending: 'bg-warning/10 text-warning',
+      failed: 'bg-destructive/10 text-destructive',
     };
-    fetchPayments();
-  }, []);
+    return map[status?.toLowerCase()] || 'bg-muted text-muted-foreground';
+  };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
-      
-      <Card>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground">Payments</h1>
+        <Button variant="outline" size="sm" onClick={fetchPayments} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        </Button>
+      </div>
+
+      <Card className="border-border bg-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Reference</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Method</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Status</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {payments.map((payment) => (
-                  <tr key={payment.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(payment.payment_date).toLocaleDateString()}
+              <tbody className="divide-y divide-border">
+                {loading ? (
+                  <tr><td colSpan={5} className="px-6 py-12 text-center"><RefreshCw className="h-6 w-6 animate-spin mx-auto text-muted-foreground" /></td></tr>
+                ) : payments.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                      <CreditCard className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                      <p>No payments recorded yet.</p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div>{payment.first_name} {payment.last_name}</div>
-                      <div className="text-xs text-gray-500">{payment.application_id}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      GHS {payment.amount}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                      {payment.reference || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge className={
-                        payment.status === 'Paid' ? 'bg-green-100 text-green-800' :
-                        payment.status === 'Failed' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }>
-                        {payment.status}
-                      </Badge>
-                    </td>
+                  </tr>
+                ) : payments.map(p => (
+                  <tr key={p.id} className="hover:bg-muted/30">
+                    <td className="px-6 py-4 text-foreground">{new Date(p.payment_date).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 font-medium text-foreground">{p.currency} {Number(p.amount).toFixed(2)}</td>
+                    <td className="px-6 py-4 font-mono text-muted-foreground">{p.reference || '—'}</td>
+                    <td className="px-6 py-4 text-foreground">{p.payment_method || '—'}</td>
+                    <td className="px-6 py-4"><Badge className={getStatusColor(p.status)}>{p.status}</Badge></td>
                   </tr>
                 ))}
-                {!loading && payments.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                      No payments found.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>

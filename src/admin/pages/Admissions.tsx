@@ -1,337 +1,136 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Search, 
-  Download, 
-  Mail, 
-  CheckCircle,
-  XCircle,
-  Clock,
-  FileText,
-  Send,
-  Eye,
-  Edit,
-  Trash2
-} from 'lucide-react';
+import { Search, CheckCircle, XCircle, RefreshCw, Eye } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { adminDataService } from '../services/adminDataService';
-import { apiService } from '../services/apiService';
 import { toast } from 'sonner';
 
-interface AdmittedStudent {
-  id: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  program: string;
-  admissionDate: string;
-  studentId: string;
-  status: 'admitted' | 'pending' | 'rejected';
-}
-
-const AdmissionsManagement = () => {
-  const [students, setStudents] = useState<AdmittedStudent[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<AdmittedStudent[]>([]);
+const Admissions = () => {
+  const [applications, setApplications] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      setLoading(true);
-      try {
-        const data = await apiService.getAdmissions();
-        const mapped = data.map((s: any) => ({
-          id: s.application_id,
-          fullName: `${s.first_name} ${s.last_name}`,
-          email: s.email,
-          phone: s.mobile_phone,
-          program: s.selected_programme,
-          admissionDate: s.updated_at,
-          studentId: s.application_id,
-          status: s.status.toLowerCase()
-        }));
-        setStudents(mapped);
-        setFilteredStudents(mapped);
-      } catch (err: any) {
-        toast.error('Failed to load admitted students');
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Get applications that are not drafts (i.e. submitted/pending/admitted/rejected)
+      let query = supabase
+        .from('applications')
+        .select('*')
+        .neq('status', 'draft')
+        .order('updated_at', { ascending: false });
+
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
       }
-    };
 
-    fetchStudents();
-  }, []);
-
-  useEffect(() => {
-    let filtered = students;
-
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(student => student.status === statusFilter);
+      const { data, error } = await query;
+      if (error) throw error;
+      setApplications(data || []);
+    } catch (err) {
+      toast.error('Failed to load admissions data');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (searchTerm) {
-      filtered = filtered.filter(s => 
-        s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.studentId.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  useEffect(() => { fetchData(); }, [statusFilter]);
+
+  const handleAction = async (id: string, action: 'approve' | 'reject') => {
+    const newStatus = action === 'approve' ? 'admitted' : 'rejected';
+    const result = await adminDataService.updateApplicationStatus(id, newStatus);
+    if (result.success) {
+      toast.success(`Application ${action === 'approve' ? 'admitted' : 'rejected'}`);
+      fetchData();
+    } else {
+      toast.error(result.error || 'Update failed');
     }
+  };
 
-    setFilteredStudents(filtered);
-  }, [students, statusFilter, searchTerm]);
+  const filtered = searchTerm
+    ? applications.filter(a => (a.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()))
+    : applications;
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'admitted': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const map: Record<string, string> = {
+      admitted: 'bg-success/10 text-success',
+      rejected: 'bg-destructive/10 text-destructive',
+      pending: 'bg-warning/10 text-warning',
+      submitted: 'bg-info/10 text-info',
+    };
+    return map[status] || 'bg-muted text-muted-foreground';
   };
-
-  const handleAdmissionAction = async (studentId: string, action: 'approve' | 'reject') => {
-    const newStatus = action === 'approve' ? 'Admitted' : 'Rejected';
-    try {
-      await apiService.updateApplicationStatus(studentId, newStatus);
-      toast.success(`Student ${action === 'approve' ? 'admitted' : 'rejected'} successfully`);
-      // Refresh
-      const data = await apiService.getAdmissions();
-      const mapped = data.map((s: any) => ({
-        id: s.application_id,
-        fullName: `${s.first_name} ${s.last_name}`,
-        email: s.email,
-        phone: s.mobile_phone,
-        program: s.selected_programme,
-        admissionDate: s.updated_at,
-        studentId: s.application_id,
-        status: s.status.toLowerCase()
-      }));
-      setStudents(mapped);
-    } catch (err: any) {
-      toast.error('Failed to update admission status');
-    }
-  };
-
-  const generateLetter = (student: AdmittedStudent) => {
-    apiService.generateAdmissionLetter(student.id).then(() => {
-        alert(`Admission letter generated for ${student.fullName}`);
-    });
-  };
-
-  const sendProspectus = (student: AdmittedStudent) => {
-    apiService.sendProspectus(student.id).then(() => {
-        alert(`Prospectus sent to ${student.email}`);
-    });
-  };
-
-  const toggleStudentSelection = (studentId: string) => {
-    setSelectedStudents(prev => 
-      prev.includes(studentId) 
-        ? prev.filter(id => id !== studentId)
-        : [...prev, studentId]
-    );
-  };
-
-  const bulkAction = (action: 'approve' | 'reject') => {
-    const selectedCount = selectedStudents.length;
-    if (selectedCount === 0) {
-      alert(`Please select students to ${action}`);
-      return;
-    }
-
-    const message = `Are you sure you want to ${action} ${selectedCount} student(s)?`;
-    if (window.confirm(message)) {
-      selectedStudents.forEach(studentId => {
-        handleAdmissionAction(studentId, action);
-      });
-      setSelectedStudents([]);
-    }
-  };
-
-  const exportAdmissions = () => {
-    apiService.exportApplications('csv');
-  };
-
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Admissions Management</h1>
-        <p className="text-gray-600">Manage student admissions, generate letters, and send prospectus</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Admissions Management</h1>
+          <p className="text-sm text-muted-foreground">Review and manage student admission decisions</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        </Button>
       </div>
 
-      {/* Filters and Actions */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search by name, email, or student ID..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            
-            <div className="flex gap-2">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">All Status</option>
-                <option value="admitted">Admitted</option>
-                <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
-              </select>
-              
-              {selectedStudents.length > 0 && (
-                <>
-                  <Button 
-                    onClick={() => bulkAction('approve')}
-                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Approve Selected ({selectedStudents.length})
-                  </Button>
-                  <Button 
-                    onClick={() => bulkAction('reject')}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <XCircle className="h-4 w-4 mr-2" />
-                    Reject Selected ({selectedStudents.length})
-                  </Button>
-                </>
-              )}
-              
-              <Button onClick={exportAdmissions} variant="outline">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
+      <Card className="border-border bg-card">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search by name..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
           </div>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="px-3 py-2 border border-input bg-background text-foreground rounded-lg">
+            <option value="all">All Status</option>
+            <option value="submitted">Submitted</option>
+            <option value="pending">Pending</option>
+            <option value="admitted">Admitted</option>
+            <option value="rejected">Rejected</option>
+          </select>
         </CardContent>
       </Card>
 
-      {/* Students Table */}
-      <Card>
+      <Card className="border-border bg-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <input
-                      type="checkbox"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedStudents(students.map(s => s.id));
-                        } else {
-                          setSelectedStudents([]);
-                        }
-                      }}
-                    />
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student Info
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Program
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Admission Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Applicant</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Programme</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-muted-foreground uppercase">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        type="checkbox"
-                        checked={selectedStudents.includes(student.id)}
-                        onChange={() => toggleStudentSelection(student.id)}
-                        className="rounded border-gray-300"
-                      />
+              <tbody className="divide-y divide-border">
+                {loading ? (
+                  <tr><td colSpan={5} className="px-6 py-12 text-center"><RefreshCw className="h-6 w-6 animate-spin mx-auto text-muted-foreground" /></td></tr>
+                ) : filtered.length === 0 ? (
+                  <tr><td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">No admissions found.</td></tr>
+                ) : filtered.map(app => (
+                  <tr key={app.id} className="hover:bg-muted/30">
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-foreground">{app.full_name || 'Unnamed'}</div>
+                      <div className="text-xs text-muted-foreground">{app.id.slice(0, 8)}...</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {student.fullName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          ID: {student.studentId}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {student.email}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {student.phone}
-                        </div>
-                      </div>
+                    <td className="px-6 py-4 text-foreground">{app.first_choice || 'N/A'}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{new Date(app.updated_at).toLocaleDateString()}</td>
+                    <td className="px-6 py-4">
+                      <Badge className={getStatusColor(app.status)}>{app.status}</Badge>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{student.program}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{student.admissionDate}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge className={getStatusColor(student.status)}>
-                        {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-3 w-3" />
-                        </Button>
-                        
-                        {student.status === 'pending' && (
+                    <td className="px-6 py-4">
+                      <div className="flex gap-1">
+                        {(app.status === 'pending' || app.status === 'submitted') && (
                           <>
-                            <Button 
-                              size="sm" 
-                              className="text-green-600 hover:text-green-700"
-                              onClick={() => handleAdmissionAction(student.id, 'approve')}
-                            >
-                              <CheckCircle className="h-3 w-3" />
+                            <Button size="sm" variant="ghost" className="text-success hover:bg-success/10" onClick={() => handleAction(app.id, 'approve')}>
+                              <CheckCircle className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              size="sm" 
-                              className="text-red-600 hover:text-red-700"
-                              onClick={() => handleAdmissionAction(student.id, 'reject')}
-                            >
-                              <XCircle className="h-3 w-3" />
-                            </Button>
-                          </>
-                        )}
-                        
-                        {student.status === 'admitted' && (
-                          <>
-                            <Button 
-                              size="sm"
-                              onClick={() => generateLetter(student)}
-                            >
-                              <FileText className="h-3 w-3" />
-                            </Button>
-                            <Button 
-                              size="sm"
-                              onClick={() => sendProspectus(student)}
-                            >
-                              <Send className="h-3 w-3" />
+                            <Button size="sm" variant="ghost" className="text-destructive hover:bg-destructive/10" onClick={() => handleAction(app.id, 'reject')}>
+                              <XCircle className="h-4 w-4" />
                             </Button>
                           </>
                         )}
@@ -348,4 +147,4 @@ const AdmissionsManagement = () => {
   );
 };
 
-export default AdmissionsManagement;
+export default Admissions;
