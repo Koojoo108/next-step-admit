@@ -39,13 +39,10 @@ const Admissions = () => {
 
   useEffect(() => { fetchData(); }, [statusFilter]);
 
-  // Realtime
+  // Poll for updates every 30 seconds
   useEffect(() => {
-    const channel = supabase
-      .channel('admissions-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'applications' }, () => fetchData())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleAction = async (id: string, action: 'approve' | 'reject') => {

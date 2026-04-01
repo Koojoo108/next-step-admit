@@ -50,15 +50,10 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  // Realtime subscription
+  // Poll for updates every 30 seconds
   useEffect(() => {
-    const channel = supabase
-      .channel('admin-dashboard-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'applications' }, () => {
-        fetchData();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const getStatusBadge = (status: string) => {
