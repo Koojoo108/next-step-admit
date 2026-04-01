@@ -208,6 +208,36 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          admission_end: string | null
+          admission_start: string | null
+          favicon_url: string | null
+          id: string
+          logo_url: string | null
+          school_name: string
+          updated_at: string
+        }
+        Insert: {
+          admission_end?: string | null
+          admission_start?: string | null
+          favicon_url?: string | null
+          id?: string
+          logo_url?: string | null
+          school_name?: string
+          updated_at?: string
+        }
+        Update: {
+          admission_end?: string | null
+          admission_start?: string | null
+          favicon_url?: string | null
+          id?: string
+          logo_url?: string | null
+          school_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
