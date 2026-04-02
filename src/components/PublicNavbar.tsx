@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import schoolCrest from '@/assets/school-crest.png';
 import { ModeToggle } from './ModeToggle';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -15,13 +16,17 @@ const navLinks = [
 const PublicNavbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { settings } = useSiteSettings();
+
+  const logoSrc = settings.logo_url || schoolCrest;
+  const schoolName = settings.school_name || 'Duapa Academy';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center gap-3">
-          <img src={schoolCrest} alt="Crest" className="h-10 w-10" />
-          <span className="font-display text-lg font-bold text-primary">Duapa Academy</span>
+          <img src={logoSrc} alt="Crest" className="h-10 w-10 object-contain" />
+          <span className="font-display text-lg font-bold text-primary">{schoolName}</span>
         </Link>
 
         {/* Desktop */}

@@ -2,16 +2,21 @@ import { Link } from 'react-router-dom';
 import schoolCrest from '@/assets/school-crest.png';
 import { Button } from './ui/button';
 import { Shield } from 'lucide-react';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 const Footer = () => {
+  const { settings } = useSiteSettings();
+  const logoSrc = settings.logo_url || schoolCrest;
+  const schoolName = settings.school_name || 'Duapa Academy';
+
   return (
     <footer className="bg-muted text-muted-foreground">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <img src={schoolCrest} alt="School Crest" className="h-12 w-12" />
-              <span className="font-display text-lg font-bold text-primary">Duapa Academy</span>
+              <img src={logoSrc} alt="School Crest" className="h-12 w-12 object-contain" />
+              <span className="font-display text-lg font-bold text-primary">{schoolName}</span>
             </div>
             <p className="text-sm leading-relaxed">
               Nurturing excellence in education since 1965. Building tomorrow's leaders today.
@@ -47,10 +52,10 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm">© {new Date().getFullYear()} Duapa Academy. All rights reserved.</p>
-          
-          <Button 
-            variant="ghost" 
+          <p className="text-sm">© {new Date().getFullYear()} {schoolName}. All rights reserved.</p>
+
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => window.open('/admin/login', '_blank')}
             className="gap-2 text-muted-foreground hover:text-primary"

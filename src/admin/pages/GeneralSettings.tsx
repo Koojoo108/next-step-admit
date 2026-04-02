@@ -21,19 +21,18 @@ const GeneralSettings = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('site_settings' as any)
+        .from('site_settings')
         .select('*')
         .limit(1)
         .single();
       if (error) throw error;
       if (data) {
-        const d = data as any;
-        setSettingsId(d.id);
-        setSchoolName(d.school_name || '');
-        setAdmissionStart(d.admission_start || '');
-        setAdmissionEnd(d.admission_end || '');
-        setLogoUrl(d.logo_url);
-        setFaviconUrl(d.favicon_url);
+        setSettingsId(data.id);
+        setSchoolName(data.school_name || '');
+        setAdmissionStart(data.admission_start || '');
+        setAdmissionEnd(data.admission_end || '');
+        setLogoUrl(data.logo_url);
+        setFaviconUrl(data.favicon_url);
       }
     } catch (err) {
       console.error(err);
@@ -78,23 +77,37 @@ const GeneralSettings = () => {
   };
 
   const save = async () => {
-    if (!settingsId) return;
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('site_settings' as any)
-        .update({
-          school_name: schoolName,
-          admission_start: admissionStart || null,
-          admission_end: admissionEnd || null,
-          logo_url: logoUrl,
-          favicon_url: faviconUrl,
-          updated_at: new Date().toISOString(),
-        } as any)
-        .eq('id', settingsId);
-      if (error) throw error;
+      if (settingsId) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({
+            school_name: schoolName,
+            admission_start: admissionStart || null,
+            admission_end: admissionEnd || null,
+            logo_url: logoUrl,
+            favicon_url: faviconUrl,
+          })
+          .eq('id', settingsId);
+        if (error) throw error;
+      } else {
+        // Insert if no settings exist yet
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({
+            school_name: schoolName,
+            admission_start: admissionStart || null,
+            admission_end: admissionEnd || null,
+            logo_url: logoUrl,
+            favicon_url: faviconUrl,
+          });
+        if (error) throw error;
+        await load(); // reload to get the new ID
+      }
       toast.success('Settings saved successfully');
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error('Failed to save settings');
     } finally {
       setSaving(false);
