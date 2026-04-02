@@ -47,7 +47,9 @@ Deno.serve(async (req) => {
       const otp = generateOTP();
       otpStore.set(phone, { code: otp, expiresAt: Date.now() + 5 * 60 * 1000 });
 
-      // Get Twilio phone number from config or use a default message
+      const TWILIO_FROM_NUMBER = Deno.env.get('TWILIO_FROM_NUMBER');
+      if (!TWILIO_FROM_NUMBER) throw new Error('TWILIO_FROM_NUMBER is not configured');
+
       const response = await fetch(`${GATEWAY_URL}/Messages.json`, {
         method: 'POST',
         headers: {
@@ -57,7 +59,7 @@ Deno.serve(async (req) => {
         },
         body: new URLSearchParams({
           To: phone,
-          From: '+15005550006', // Twilio test number; replace with your real Twilio number
+          From: TWILIO_FROM_NUMBER,
           Body: `Your Duapa Academy verification code is: ${otp}. This code expires in 5 minutes. Do not share it with anyone.`,
         }),
       });
