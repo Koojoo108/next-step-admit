@@ -28,12 +28,12 @@ export const useSiteSettings = () => {
   const fetchSettings = async () => {
     try {
       const { data, error } = await supabase
-        .from('site_settings' as any)
+        .from('site_settings')
         .select('*')
         .limit(1)
         .single();
       if (error) throw error;
-      if (data) setSettings(data as any);
+      if (data) setSettings(data as unknown as SiteSettings);
     } catch {
       // Use defaults
     } finally {
