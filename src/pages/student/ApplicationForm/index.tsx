@@ -229,24 +229,30 @@ export default function ApplicationForm() {
       
       console.log('[ApplicationForm] Saving application data:', applicationData);
       
-      // Save application to database via API
-      console.log('[ApplicationForm] Attempting to save to database via API...');
+      // Save application to Supabase
+      console.log('[ApplicationForm] Saving to Supabase...');
       
-      const response = await fetch('http://localhost:3000/api/applications/submit-full', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(applicationData),
-      });
+      const { data: result, error: submitError } = await supabase
+        .from('applications')
+        .upsert({
+          user_id: applicationData.user_id,
+          full_name: applicationData.full_name,
+          gender: applicationData.gender,
+          date_of_birth: applicationData.date_of_birth,
+          address: applicationData.address,
+          guardian_name: applicationData.guardian_name,
+          guardian_phone: applicationData.guardian_phone,
+          first_choice: applicationData.programme,
+          second_choice: applicationData.programme_name,
+          jhs_name: applicationData.jhs_name,
+          bece_index: applicationData.bece_index,
+          status: 'Submitted',
+        }, { onConflict: 'user_id' })
+        .select()
+        .single();
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit application');
-      }
-
-      const result = await response.json();
-      console.log('[ApplicationForm] Application saved successfully to database:', result);
+      if (submitError) throw new Error(submitError.message || 'Failed to submit application');
+      console.log('[ApplicationForm] Application saved successfully:', result);
       
       // Simulate API submission for user feedback
       await new Promise(resolve => setTimeout(resolve, 2000));
