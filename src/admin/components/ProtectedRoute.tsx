@@ -10,7 +10,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-50">Loading Auth...</div>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-3">
+        <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-muted-foreground">Authenticating...</p>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
