@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,6 +27,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
+  const initDone = useRef(false);
 
   const checkAdminRole = async (userId: string) => {
     try {
@@ -49,26 +50,49 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   useEffect(() => {
+    if (initDone.current) return;
+    initDone.current = true;
+
+    // Safety timeout — never stay loading forever
+    const timeout = setTimeout(() => {
+      setLoading(prev => {
+        if (prev) {
+          console.warn('[AdminAuth] Loading timed out after 8s, forcing ready');
+          return false;
+        }
+        return prev;
+      });
+    }, 8000);
+
     const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const isUserAdmin = await checkAdminRole(session.user.id);
-        setUser(session.user);
-        setIsAuthenticated(true);
-        setIsAdmin(isUserAdmin);
-        console.log(`[AdminAuth] Session restored. Email: ${session.user.email}, isAdmin: ${isUserAdmin}`);
-      } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const isUserAdmin = await checkAdminRole(session.user.id);
+          setUser(session.user);
+          setIsAuthenticated(true);
+          setIsAdmin(isUserAdmin);
+          console.log(`[AdminAuth] Session restored. Email: ${session.user.email}, isAdmin: ${isUserAdmin}`);
+        } else {
+          console.log('[AdminAuth] No session found');
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+        }
+      } catch (err) {
+        console.error('[AdminAuth] Init error:', err);
         setIsAuthenticated(false);
         setIsAdmin(false);
+      } finally {
+        setLoading(false);
+        clearTimeout(timeout);
       }
-      setLoading(false);
     };
 
     initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log(`[AdminAuth] Auth state change: ${event}`);
-      if (session) {
+      if (session?.user) {
         const isUserAdmin = await checkAdminRole(session.user.id);
         setUser(session.user);
         setIsAuthenticated(true);
@@ -81,7 +105,10 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
