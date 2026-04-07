@@ -29,54 +29,27 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const navigate = useNavigate();
 
   const checkAdminRole = async (userId: string) => {
-    // ALWAYS allow this specific email as admin regardless of database state
-    const { data: { session } } = await supabase.auth.getSession();
-    const userEmail = session?.user?.email;
-    const adminEmails = ['admin@duapa.edu.gh'];
-    
-    if (userEmail && adminEmails.includes(userEmail)) {
-      return true;
-    }
-
     try {
-      // Check user_roles table
-      const { data: tableExists, error: tableError } = await supabase
+      const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .eq('role', 'admin')
         .maybeSingle();
-      
-      return !!tableExists;
+
+      if (error) {
+        console.error('[AdminAuth] Role check error:', error);
+        return false;
+      }
+      return !!data;
     } catch (err) {
       console.error('[AdminAuth] Error checking role:', err);
-      return adminEmails.includes(userEmail || '');
+      return false;
     }
   };
 
   useEffect(() => {
     const initAuth = async () => {
-      // Check for mock session first
-      const mockSessionStr = localStorage.getItem('admin_mock_session');
-      if (mockSessionStr) {
-        try {
-          const mockSession = JSON.parse(mockSessionStr);
-          // Check if it's less than 24 hours old
-          if (Date.now() - mockSession.timestamp < 24 * 60 * 60 * 1000) {
-            console.log('[AdminAuth] Restoring mock admin session');
-            setUser(mockSession.user);
-            setIsAuthenticated(true);
-            setIsAdmin(true);
-            setLoading(false);
-            return;
-          } else {
-            localStorage.removeItem('admin_mock_session');
-          }
-        } catch (e) {
-          localStorage.removeItem('admin_mock_session');
-        }
-      }
-
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const isUserAdmin = await checkAdminRole(session.user.id);
@@ -114,57 +87,25 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const login = async (email: string, password: string) => {
     console.log(`[AdminAuth] Attempting login for: ${email}`);
     setLoading(true);
-    
+
     try {
-      const isAdminEmail = email === 'admin@duapa.edu.gh';
-      const isAdminPassword = password === 'Off0241800448$';
-      
-      if (!isAdminEmail || !isAdminPassword) {
-        setLoading(false);
-        return { success: false, error: 'Invalid admin credentials' };
-      }
-      
-      // Try normal Supabase auth
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        console.error('[AdminAuth] Supabase auth error:', error);
-        
-        // Bypass for the specific admin email if it fails (unconfirmed or not in DB)
-        if (isAdminEmail) {
-          console.log('[AdminAuth] Applying bypass for admin email');
-          
-          const mockUser = { 
-            email, 
-            id: `admin-${email.replace(/[^a-zA-Z0-9]/g, '-')}`,
-            aud: 'authenticated',
-            role: 'authenticated',
-          };
-
-          // We don't call setSession with mock data as it might fail validation
-          // Instead, we just set the local state directly
-          setUser(mockUser);
-          setIsAuthenticated(true);
-          setIsAdmin(true);
-          
-          // Store a flag in localStorage to persist this mock session across reloads
-          localStorage.setItem('admin_mock_session', JSON.stringify({
-            user: mockUser,
-            timestamp: Date.now()
-          }));
-
-          setLoading(false);
-          return { success: true };
-        }
-        
+        console.error('[AdminAuth] Login error:', error.message);
         setLoading(false);
         return { success: false, error: error.message };
       }
 
-      console.log('[AdminAuth] Login successful via Supabase');
+      const isUserAdmin = await checkAdminRole(data.user.id);
+      if (!isUserAdmin) {
+        await supabase.auth.signOut();
+        setLoading(false);
+        return { success: false, error: 'Access denied. You do not have admin privileges.' };
+      }
+
+      console.log('[AdminAuth] Admin login successful');
+      setLoading(false);
       return { success: true };
     } catch (error: any) {
       console.error('[AdminAuth] Unexpected login error:', error);
@@ -177,9 +118,8 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       await supabase.auth.signOut();
     } catch (err) {
-      console.error('[AdminAuth] Error during API logout:', err);
+      console.error('[AdminAuth] Error during logout:', err);
     } finally {
-      localStorage.removeItem('admin_mock_session');
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);
@@ -187,19 +127,9 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const value = {
-    user,
-    isAuthenticated,
-    isAdmin,
-    loading,
-    login,
-    logout
-  };
-
   return (
-    <AdminAuthContext.Provider value={value}>
+    <AdminAuthContext.Provider value={{ user, isAuthenticated, isAdmin, loading, login, logout }}>
       {children}
     </AdminAuthContext.Provider>
   );
 };
-
